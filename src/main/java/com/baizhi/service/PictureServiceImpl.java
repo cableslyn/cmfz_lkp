@@ -2,6 +2,7 @@ package com.baizhi.service;
 
 import com.baizhi.dao.PictureDao;
 import com.baizhi.entity.Picture;
+import com.baizhi.annotation.redisCache;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class PictureServiceImpl implements PictureService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
+    @redisCache
     public List<Picture> findAll(Integer page, Integer rows) {
         Picture picture = new Picture();
         RowBounds rb = new RowBounds((page-1)*rows,rows);

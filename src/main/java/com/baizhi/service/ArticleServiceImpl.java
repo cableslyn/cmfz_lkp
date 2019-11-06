@@ -2,6 +2,7 @@ package com.baizhi.service;
 
 import com.baizhi.dao.ArticleDao;
 import com.baizhi.entity.Article;
+import com.baizhi.annotation.redisCache;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleDao articleDao;
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
+    @redisCache
     public Map<String, Object> findAll(Integer page, Integer rows) {
         Article article = new Article();
         RowBounds rowBounds = new RowBounds((page - 1) * rows, rows);
