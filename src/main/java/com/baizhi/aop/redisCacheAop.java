@@ -1,27 +1,27 @@
 package com.baizhi.aop;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baizhi.annotation.ClearRedisCache;
 import com.baizhi.annotation.redisCache;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.Jedis;
 
 import java.lang.reflect.Method;
 import java.util.Set;
 
-@Configuration
-@Aspect
+/*@Configuration
+@Aspect*/
 public class redisCacheAop {
 
     @Autowired
     private Jedis jedis;
 
-    @Around("execution(* com.baizhi.service.*impl.findAll(..))")
+    @Around("execution(* com.baizhi.service.*Impl.findAll(..))")
     public Object around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object target = proceedingJoinPoint.getTarget();
         MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
@@ -58,7 +58,7 @@ public class redisCacheAop {
         }
     }
 
-    @Around("execution(* com.baizhi.service.*impl(..)) && !execution(* com.baizhi.service.*impl.selectAll(..))")
+    @After("execution(* com.baizhi.service.*Impl(..)) && !execution(* com.baizhi.service.*Impl.selectAll(..))")
     public void after(JoinPoint joinPoint){
 
         /*Object target = joinPoint.getTarget();
@@ -66,13 +66,31 @@ public class redisCacheAop {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Object[] args = joinPoint.getArgs();
         Method method = methodSignature.getMethod();*/
-        String className = joinPoint.getTarget().getClass().getName();
+      /*  String className = joinPoint.getTarget().getClass().getName();
         Set<String> keys = jedis.keys("*");
         for (String key : keys) {
             if (key.startsWith(className)){
                 jedis.del(key);
             }
         }
-        jedis.close();
+        jedis.close();*/
+        Object target = joinPoint.getTarget();
+        String className = target.getClass().getName();
+
+
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        Object[] args = joinPoint.getArgs();
+
+        Method method = methodSignature.getMethod();
+        boolean b = method.isAnnotationPresent(ClearRedisCache.class);
+        if(b){
+//            清除缓存
+            Set<String> keys = jedis.keys("*");
+            for (String key : keys) {
+                if(key.startsWith(className)){
+                    jedis.del(key);
+                }
+            }
+        }
     }
 }

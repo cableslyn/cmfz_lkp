@@ -1,8 +1,9 @@
 package com.baizhi.service;
 
+import com.baizhi.annotation.ClearRedisCache;
+import com.baizhi.annotation.redisCache;
 import com.baizhi.dao.PictureDao;
 import com.baizhi.entity.Picture;
-import com.baizhi.annotation.redisCache;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class PictureServiceImpl implements PictureService {
     }
 
     @Override
+    @ClearRedisCache
     public void save(Picture picture){
         picture.setId(UUID.randomUUID().toString());
         picture.setCreatedate(new Date());
@@ -40,6 +42,7 @@ public class PictureServiceImpl implements PictureService {
         pictureDao.insert(picture);
     }
     @Override
+    @ClearRedisCache
     public void update(Picture picture,HttpServletRequest request){
         System.out.println(picture);
         if (picture.getCover() == null||picture.getCover().equals("")){
@@ -60,6 +63,7 @@ public class PictureServiceImpl implements PictureService {
     }
 
     @Override
+    @ClearRedisCache
     public void delete(Picture picture,HttpServletRequest request) {
         Picture picture1 = pictureDao.selectByPrimaryKey(picture.getId());
         System.out.println("要删除的数据"+picture1);
